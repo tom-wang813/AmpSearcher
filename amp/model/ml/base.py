@@ -22,6 +22,23 @@ class ModelModule(ABC):
         """
         return cls(**dict(cfg))
 
+    @classmethod
+    def from_yaml(cls, path: str):
+        """Instantiate the model from a YAML configuration file.
+
+        The YAML file should contain key-value pairs that match the
+        constructor arguments of the concrete model class.
+
+        Parameters
+        ----------
+        path : str
+            Path to the YAML configuration file.
+        """
+        from amp.utils import load_yaml_config
+
+        cfg = load_yaml_config(path)
+        return cls(**cfg)
+
     @abstractmethod
     def build(self):
         """
