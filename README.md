@@ -6,155 +6,67 @@ This repository implements a modular, configurable pipeline for protein sequence
 
 ```text
 project_root/
-├── README.md                             # Project overview and instructions
-├── pyproject.toml / setup.py / requirements.txt  # Project metadata and dependencies
-│
-├── configs/                              # Hydra/OmegaConf configuration files
-│   ├── config.yaml                       # Main config, defines defaults
-│   ├── data/                             # Data settings
-│   │   ├── default.yaml                  # raw path, split strategy, seed
-│   │   └── kfold.yaml                    # K‑Fold split override
-│   ├── model/                            # Model and hyperparameter settings
-│   │   ├── default.yaml                  # default model type, search strategy
-│   │   ├── svm.yaml                      # SVM-specific overrides
-│   │   ├── rf.yaml                       # Random Forest-specific overrides
-│   │   └── nn.yaml                       # Neural Network-specific overrides
-│   ├── experiment/                       # Experiment settings
-│   │   ├── default.yaml                  # run count, run_id prefix, log backend
-│   │   └── mlflow.yaml                   # MLflow-specific settings
-│   └── logger/                           # Logger backends
-│       ├── default.yaml                  # tensorboard/console defaults
-│       └── wandb.yaml                    # Weights & Biases settings
-│
-├── data/                                 # Raw data directory
-│   └── raw/                              # Single source: raw protein sequences and labels
-│
-├── src/                                  # Core pipeline code
-│   ├── __main__.py                       # CLI entrypoint (e.g. `python -m src --config-name=svm`)
-│   ├── settings.py                       # Hydra initialization and global constants
-│   │
-│   ├── data/                      # Data ingestion and splitting
-│   │   ├── __init__.py
-│   │   ├── base.py                       # DataModule interface
-│   │   └── protein_data.py               # Implementation for protein data
-│   │
-│   ├── feature/                   # Descriptor extraction and preprocessing
-│   │   ├── __init__.py
-│   │   ├── base.py                       # FeatureModule interface
-│   │   └── rdkit_descriptor.py           # RDKit descriptor implementation
-│   │
-│   ├── model/                     # Model, optimizer, and scheduler definitions
-│   │   ├── __init__.py
-│   │   ├── base.py                       # ModelModule interface
-│   │   ├── svm.py                        # SVM module
-│   │   ├── rf.py                         # Random Forest module
-│   │   └── nn.py                         # Neural Network module
-│   │
-│   ├── runner/                           # Experiment orchestration
-│   │   ├── __init__.py
-│   │   └── experiment.py                 # ExperimentRunner that orchestrates modules
-│   │
-│   ├── logger/                    # Logging and visualization backends
-│   │   ├── __init__.py
-│   │   ├── base.py                       # Logger interface
-│   │   ├── tensorboard.py                # TensorBoard implementation
-│   │   └── wandb.py                      # Weights & Biases implementation
-│   │
-│   └── utils/                            # Utility functions
-│       ├── __init__.py
-│       ├── metrics.py                    # Metrics computation (accuracy, ROC AUC, MSE)
-│       └── io.py     
-│
-├── scripts/                              # Utility scripts for batch experiments and reporting
-│   ├── run_all.sh                        # Run multiple configs sequentially
-│   └── report_generator.py               # Generate summary reports
-│
-├── experiments/                          # Local MLflow or W&B storage (if enabled locally)
-│
-├── tests/                                # Unit tests for each module
-│   ├── test_data_module.py
-│   ├── test_feature_module.py
-│   └── test_model_module.py
-│
-├── outputs/                              # Artifacts for each run stored by run_id
-│   ├── 20250522-123456/                  # Example run_id named by timestamp
-│   └── 20250522-134501/
-│
-└── logs/                                 # Centralized pipeline logs
-    └── project.log
-````
-
-## Installation
-
-1. **Clone repository**
-
-   ```bash
-   git clone git@your-repo-url.git
-   cd project_root
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   # Or using Poetry / pyproject.toml:
-   pip install .
-   ```
-
-## Usage
-
-### Running a Single Experiment
-
-```bash
-python -m src --config-name svm
+├── README.md                   # 项目说明文档，包含目录结构和使用说明
+├── setup.py                    # 项目安装脚本，用于打包和依赖管理
+├── .gitignore                  # Git 忽略文件配置
+├── configs/                    # 配置文件目录，使用 Hydra/OmegaConf 管理
+│   ├── base.yaml               # 通用基础配置文件
+│   ├── data/                   # 数据相关配置
+│   ├── model/                  # 模型相关配置
+│   ├── experiment/             # 实验相关配置
+│   └── logger/                 # 日志相关配置
+├── amp/                        # 核心代码目录
+│   ├── data/                   # 数据处理模块
+│   │   ├── feature/            # 特征提取代码
+│   │   └── split/              # 数据集划分代码
+│   ├── models/                 # 模型实现目录
+│   │   ├── ml/                 # 传统机器学习模型
+│   │   │   ├── classification/ # 分类模型（如 SVM、随机森林）
+│   │   │   ├── regression/     # 回归模型（如线性回归）
+│   │   │   └── sequence/       # 序列模型（如 HMM、CRF）
+│   │   ├── dl/                 # 深度学习模型
+│   │   │   ├── classification/ # 深度学习分类模型（如 CNN、Transformer）
+│   │   │   ├── regression/     # 深度学习回归模型
+│   │   │   └── sequence/       # 深度学习序列模型（如 RNN、Transformer）
+│   │   ├── multi_task/         # 多任务模型
+│   │   │   ├── shared_layers.py # 共享层设计
+│   │   │   ├── multi_task_model.py # 多任务模型主结构
+│   │   │   └── task_specific.py # 任务特定的头部
+│   ├── layers/                 # 通用层设计
+│   │   ├── attention.py        # 注意力机制
+│   │   ├── fully_connected.py  # 自定义全连接层
+│   │   ├── convolutional.py    # 自定义卷积层
+│   │   └── recurrent.py        # 自定义循环层
+│   ├── metrics/                # 评估指标模块
+│   ├── trainer/                # 模型训练模块
+│   ├── postprocess/            # 后处理模块
+│   └── utils/                  # 工具函数模块
+├── tests/                      # 测试代码目录
+│   ├── test_data.py            # 数据处理相关测试
+│   ├── test_model.py           # 模型相关测试
+│   └── test_utils.py           # 工具函数相关测试
+├── notebooks/                  # Jupyter Notebook 目录，用于交互式实验
+│   └── exploratory_analysis.ipynb # 数据探索分析
+├── scripts/                    # 脚本目录
+│   ├── run_all.sh              # 一键运行脚本
+│   └── report_generator.py     # 报告生成脚本
 ```
 
-### Overriding Configuration via CLI
+---
 
-```bash
-python -m src --config-name rf experiment.run_id=myrun data.seed=42
-```
+### **修改说明**
+1. **新增目录：**
+   - `layers/`：存放通用的神经网络层设计，便于复用。
+   - `multi_task/`：专门存放多任务模型的实现，包括共享层和任务特定头部。
 
-### Batch Experiments
+2. **调整模型目录：**
+   - 将传统机器学习模型和深度学习模型分开存放，避免混淆。
+   - 深度学习模型进一步细分为分类、回归和序列模型。
 
-```bash
-bash scripts/run_all.sh
-```
+3. **注释：**
+   - 为每个目录和文件添加了详细的注释，说明其用途和内容。
 
-## Configuration
+---
 
-All configurations live under `configs/`. Hydra will merge defaults and overrides:
-
-* **data**: raw data path, split strategy, random seed
-* **model**: model type and hyperparameter search space
-* **experiment**: run counts, run\_id prefix, logging backend
-* **logger**: TensorBoard or W\&B settings
-
-## Outputs
-
-Each experiment run creates `outputs/<run_id>/` containing:
-
-* `config_used.yaml`: full merged configuration
-* `model_checkpoint/`: saved model artifacts
-* `metrics.json`: performance metrics on train/val/test
-* `figures/`: ROC, PR curves, etc.
-
-## Logging
-
-Global logs written to `logs/project.log`. If MLflow or W\&B is enabled, experiment metadata and metrics are also pushed to the respective backend under `experiments/`.
-
-## Testing
-
-Run unit tests:
-
-```bash
-pytest tests/
-```
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch
-3. Implement features and write tests
-4. Submit a pull request
-
+### **总结**
+这个更新后的 `README.md` 更加清晰地展示了项目的结构，特别是对多任务模型和自定义层的支持。你可以直接将其替换到你的项目中，方便团队成员快速理解项目结构。

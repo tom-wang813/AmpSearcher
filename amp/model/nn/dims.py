@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Type
+from typing import List, Optional, Dict, Type, Union
 
 class DimStrategy(ABC):
     @abstractmethod
@@ -30,19 +30,26 @@ class DimCalculator:
                   input_dim: int,
                   output_dim: int,
                   num_layers: int,
-                  method: str = 'linear',
+                  method: Union[str, DimStrategy, Type[DimStrategy]] = 'linear',
                   initial_hidden_dim: Optional[int] = None,
                   ratios: Optional[List[float]] = None,
                   custom_dims: Optional[List[int]] = None
                   ) -> List[int]:
-        key = method.lower()
-        if key not in cls._strategies:
-            raise ValueError(f"Unknown method '{method}'. "
-                             f"Available: {list(cls._strategies.keys())}")
-        return cls._strategies[key].calculate(
+        if isinstance(method, DimStrategy):
+            strategy = method
+        elif isinstance(method, type) and issubclass(method, DimStrategy):
+            strategy = method()
+        elif isinstance(method, str):
+            method = method.lower()
+            if method not in cls._strategies:
+                raise ValueError(f"Unknown method '{method}'. Available methods: {list(cls._strategies.keys())}")
+            strategy = cls._strategies[method]
+        else:
+            raise TypeError("method must be a string or an instance of DimStrategy.")
+        return strategy.calculate(
             input_dim=input_dim,
             output_dim=output_dim,
-            num_layers=num_layers,
+            num_layers=num_layers,          
             initial_hidden_dim=initial_hidden_dim,
             ratios=ratios,
             custom_dims=custom_dims

@@ -1,15 +1,15 @@
 import torch 
 import torch.nn as nn
-from typing import Optional, List
+from typing import Optional, List, Union, Dict, Any
 
-from amp.model.nn.dims import DimCalculator
+from .dims import DimCalculator, DimStrategy
 
 class Network(nn.Module):
     def __init__(self,
                  input_dim: int,
                  output_dim: int,
                  num_layers: int,
-                 method: str = 'linear',
+                 method: Union[str, DimStrategy,type[DimStrategy]] = 'linear',
                  initial_hidden_dim: Optional[int] = None,
                  ratios: Optional[List[float]] = None,
                  custom_dims: Optional[List[int]] = None):
@@ -18,17 +18,22 @@ class Network(nn.Module):
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.num_layers = num_layers
-        self.method = method
+        # 支持 str / DimStrategy 实例 / DimStrategy 子类
+        if isinstance(method, str):
+            self.method = method.lower()
+        elif isinstance(method, DimStrategy) or (isinstance(method, type) and issubclass(method, DimStrategy)):
+            self.method = method
+        else:
+            raise TypeError("method must be a str, DimStrategy instance or DimStrategy subclass.")
+        
         self.initial_hidden_dim = initial_hidden_dim
         self.ratios = ratios
         self.custom_dims = custom_dims
-
-        # 计算每层的维度
         self.hidden_dims = DimCalculator.calculate(
             input_dim=input_dim,
             output_dim=output_dim,
             num_layers=num_layers,
-            method=method,
+            method=self.method,
             initial_hidden_dim=initial_hidden_dim,
             ratios=ratios,
             custom_dims=custom_dims
@@ -69,3 +74,4 @@ class Network(nn.Module):
         for i in range(layer_index):
             x = self.network[i](x)
         return x
+
