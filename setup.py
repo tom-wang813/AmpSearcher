@@ -16,6 +16,7 @@ setup(
         "black>=21.7b0",
         "flake8>=3.9.2",
         "isort>=5.9.3",
+        "pyyaml>=6.0",
     ],
     python_requires=">=3.10",
 )

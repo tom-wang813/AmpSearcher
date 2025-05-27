@@ -70,3 +70,16 @@ project_root/
 
 ### **总结**
 这个更新后的 `README.md` 更加清晰地展示了项目的结构，特别是对多任务模型和自定义层的支持。你可以直接将其替换到你的项目中，方便团队成员快速理解项目结构。
+---
+
+### YAML Configuration
+
+`amp.utils` 提供 `load_yaml_config` 函数用于读取 YAML 配置文件。
+`ModelModule` 及其子类新增 `from_yaml` 方法，可以直接从 YAML
+文件实例化模型。
+
+```python
+from amp.model.ml.svm import SVM
+
+model = SVM.from_yaml("configs/model/svm.yaml")
+```
