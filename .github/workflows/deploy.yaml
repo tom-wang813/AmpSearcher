@@ -1,0 +1,37 @@
+name: Deploy AmpSearcher API
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup DVC
+      uses: iterative/setup-dvc@v1
+
+    - name: Pull ONNX Model
+      run: dvc pull models/contrastive.onnx
+
+    - name: Build and Push Docker Image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./api/Dockerfile
+        push: true
+        tags: your-docker-repo/ampsearcher-api:latest
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Deploy to Server
+      run: |
+        # Replace with your actual deployment commands
+        # Example: SSH into your server and run docker commands
+        # ssh user@your-server.com "docker pull your-docker-repo/ampsearcher-api:latest && docker stop ampsearcher-api || true && docker rm ampsearcher-api || true && docker run -d --name ampsearcher-api -p 8000:8000 your-docker-repo/ampsearcher-api:latest"
+        echo "Deployment commands go here. Please replace this with your actual deployment logic."
