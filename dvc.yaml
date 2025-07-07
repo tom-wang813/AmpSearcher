@@ -1,0 +1,36 @@
+stages:
+  generate_data:
+    cmd: python scripts/generate_synthetic_data.py --output_path data/synthetic_data.csv
+    deps:
+      - scripts/generate_synthetic_data.py
+    outs:
+      - data/synthetic_data.csv
+
+  train_contrastive_model:
+    cmd: python train.py --config_path configs/examples/contrastive_simclr_physicochemical.yaml
+    deps:
+      - train.py
+      - configs/examples/contrastive_simclr_physicochemical.yaml
+      - data/processed/baseline_training_data.csv
+      - src/amp_searcher
+    outs:
+      - lightning_logs/contrastive_simclr_physicochemical
+
+  run_optimization:
+    cmd: python scripts/run_optimization.py --config configs/optimizers/ga_example.yaml --output results/optimized_sequences.csv --model_checkpoint_path "$(python scripts/find_latest_checkpoint.py lightning_logs/synthetic_classifier_run | tr -d '\n')"
+    deps:
+      - scripts/run_optimization.py
+      - scripts/find_latest_checkpoint.py
+      - configs/optimizers/ga_example.yaml
+      - lightning_logs/synthetic_classifier_run
+    outs:
+      - results/optimized_sequences.csv
+
+  visualize_results:
+    cmd: pip install -r requirements.txt && python scripts/visualize_optimization_results.py --original_data data/synthetic_data.csv --optimized_data results/optimized_sequences.csv --output_plot results/score_distribution.png
+    deps:
+      - scripts/visualize_optimization_results.py
+      - data/synthetic_data.csv
+      - results/optimized_sequences.csv
+    outs:
+      - results/score_distribution.png

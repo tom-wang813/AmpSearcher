@@ -1,0 +1,5 @@
+outs:
+- md5: 657149f1be781af6f8212faa63c86757
+  size: 209811
+  hash: md5
+  path: contrastive.onnx

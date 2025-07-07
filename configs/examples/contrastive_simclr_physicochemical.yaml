@@ -1,0 +1,31 @@
+featurizer:
+  name: PhysicochemicalFeaturizer
+
+model:
+  type: contrastive
+  architecture:
+    name: SimCLRBackbone
+    params:
+      input_dim: 10 # PhysicochemicalFeaturizer outputs 10 features
+      embedding_dim: 128
+      hidden_dims: [256, 128]
+  lightning_module_params:
+    temperature: 0.07
+    optimizer_params:
+      lr: 0.001
+    scheduler_params:
+      name: StepLR
+      step_size: 10
+      gamma: 0.1
+
+trainer:
+  max_epochs: 10
+  logger_name: contrastive_simclr_physicochemical
+  log_dir: ./lightning_logs
+  monitor_gradients: True
+
+data:
+  path: data/processed/baseline_training_data.csv
+  sequence_col: sequence
+  label_col: label
+  
