@@ -1,0 +1,42 @@
+# Configuration for a lightweight, end-to-end test training run
+
+# Project and Experiment Info
+project_name: "AmpSearcher-E2E-Test"
+run_name: "e2e_test_ffnn_physicochemical"
+
+# Data Configuration
+data:
+  path: "data/processed/baseline_training_data.csv"
+  sequence_col: "sequence"
+  label_col: "label"
+  batch_size: 8 # Small batch size for testing
+
+# Featurizer Configuration
+featurizer:
+  name: 'PhysicochemicalFeaturizer'
+  params: {}
+
+# Model Configuration
+model:
+  lightning_module_name: 'ScreeningLightningModule'
+  architecture:
+    name: 'FeedForwardNeuralNetwork'
+    params:
+      input_dim: null  # Inferred automatically
+      hidden_dims: [16, 8] # Smaller network for faster testing
+      output_dim: 1
+  lightning_module_params:
+    task_type: 'classification'
+    optimizer_params:
+      lr: 0.001
+
+# Trainer Configuration
+trainer:
+  max_epochs: 1
+  accelerator: "cpu" # Force CPU for consistency in tests
+  devices: 1
+  logger_name: "e2e_test_run"
+  log_dir: "lightning_logs/"
+  limit_train_batches: 2 # Run only 2 batches for training
+  limit_val_batches: 2   # Run only 2 batches for validation
+  callbacks: [] # No callbacks for this test

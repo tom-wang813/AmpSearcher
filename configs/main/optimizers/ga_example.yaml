@@ -1,0 +1,40 @@
+optimizer:
+  name: ga
+  population_size: 50
+  mutation_rate: 0.1
+  crossover_rate: 0.8
+
+constraints:
+  max_length: 20
+  alphabet: "ACGT" # Use a smaller alphabet for synthetic data
+
+n_iterations: 10
+
+# --- Model Configuration (Oracle) ---
+# This model will be trained using the 'train_model' DVC stage.
+model:
+  name: "FeedForwardNeuralNetwork"
+  architecture:
+    name: "FeedForwardNeuralNetwork"
+    params:
+      input_dim: 20 # AAC featurizer outputs 20 features
+      hidden_dims: [64, 32]
+      output_dim: 1
+  lightning_module:
+    name: "ScreeningLightningModule"
+    params:
+      task_type: "classification"
+      optimizer_params:
+        name: "Adam"
+        params:
+          lr: 0.001
+
+# This path will be dynamically determined by the DVC pipeline after model training.
+# It should point to the latest checkpoint of the trained synthetic classifier.
+model_checkpoint_path: "" # This path will be dynamically determined by the DVC pipeline after model training.
+
+featurizer:
+  name: "CompositionFeaturizer"
+  params:
+    include_aac: True
+    include_dpc: False

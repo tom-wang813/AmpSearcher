@@ -1,0 +1,40 @@
+featurizer:
+  name: "CompositionFeaturizer"
+  params:
+    include_aac: True
+    include_dpc: False # Keep it simple for synthetic data
+
+model:
+  type: "ScreeningLightningModule"
+  architecture:
+    name: "FeedForwardNeuralNetwork"
+    params:
+      input_dim: 20 # AAC featurizer outputs 20 features
+      hidden_dims: [64, 32]
+      output_dim: 1 # Binary classification
+  lightning_module_params:
+    task_type: "classification"
+    optimizer_params:
+      name: "Adam"
+      params:
+        lr: 0.001
+
+trainer:
+  max_epochs: 5
+  accelerator: "cpu"
+  devices: 1
+  logger_name: "synthetic_classifier_run"
+  log_dir: "./lightning_logs"
+  batch_size: 32
+  callbacks:
+    - class_path: pytorch_lightning.callbacks.ModelCheckpoint
+      init_args:
+        dirpath: "./lightning_logs/synthetic_classifier_run/checkpoints"
+        filename: "model-{epoch:02d}"
+        monitor: "train_loss"
+        mode: "min"
+        save_top_k: 1
+
+mlflow:
+  experiment_name: "Synthetic_Classifier_Training"
+  tracking_uri: "mlruns"

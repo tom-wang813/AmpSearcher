@@ -1,0 +1,26 @@
+featurizer:
+  name: PhysicochemicalFeaturizer
+
+model:
+  type: screening
+  architecture:
+    name: FFNN
+    params:
+      input_dim: 10 # PhysicochemicalFeaturizer outputs 10 features
+      output_dim: 1
+      hidden_dims: [64, 32]
+  lightning_module_params:
+    task_type: classification
+    optimizer_params:
+      lr: 0.001
+    scheduler_params:
+      name: StepLR
+      step_size: 10
+      gamma: 0.1
+
+trainer:
+  max_epochs: 10
+  logger_name: screening_ffnn_physicochemical
+  log_dir: ./lightning_logs
+  monitor_gradients: True
+  

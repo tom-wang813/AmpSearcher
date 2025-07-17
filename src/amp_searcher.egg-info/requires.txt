@@ -1,0 +1,8 @@
+numpy
+torch
+pytorch-lightning
+biopython
+pyyaml
+torchmetrics
+fastapi
+uvicorn

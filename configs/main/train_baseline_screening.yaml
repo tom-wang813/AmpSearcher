@@ -1,0 +1,40 @@
+# Configuration for training a baseline screening model
+
+# Project and Experiment Info
+project_name: "AmpSearcher-Baseline"
+run_name: "baseline_screening_ffnn_physicochemical"
+
+# Featurizer Configuration
+featurizer:
+  name: 'PhysicochemicalFeaturizer'
+  params: {}
+
+# Model Configuration (structured for AmpTrainer)
+model:
+  lightning_module_name: 'ScreeningLightningModule'
+  architecture:
+    name: 'FeedForwardNeuralNetwork'
+    params:
+      input_dim: null  # This will be inferred automatically
+      hidden_dims: [64, 32]
+      output_dim: 1
+  lightning_module_params:
+    task_type: 'classification'
+    optimizer_params:
+      lr: 0.001
+
+# Trainer Configuration
+trainer:
+  max_epochs: 5
+  accelerator: "auto"
+  devices: 1
+  logger_name: "baseline_screening_run"
+  log_dir: "lightning_logs/"
+  gradient_clip_val: 0.5
+  callbacks:
+    - _target_: pytorch_lightning.callbacks.ModelCheckpoint
+      dirpath: "checkpoints/baseline_screening"
+      filename: "{epoch:02d}-{val_loss:.2f}"
+      save_top_k: 1
+      monitor: "val_loss"
+      mode: "min"

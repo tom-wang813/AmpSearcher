@@ -1,0 +1,31 @@
+featurizer:
+  name: PhysicochemicalFeaturizer
+
+model:
+  type: ScreeningLightningModule # Updated to use LightningModule name
+  architecture:
+    name: FeedForwardNeuralNetwork
+    params:
+      input_dim: 10 # Placeholder, will be determined by featurizer output
+      hidden_dims: [64, 32]
+      output_dim: 1
+  lightning_module_params:
+    task_type: classification
+    optimizer_params:
+      lr: 0.001
+    scheduler_params:
+      name: StepLR
+      step_size: 10
+      gamma: 0.1
+
+trainer:
+  max_epochs: 5
+  logger_name: amp_training_run
+  log_dir: ./lightning_logs
+  monitor_gradients: True
+  # Other Trainer args can be added here, e.g., accelerator: "gpu", devices: 1
+
+mlflow:
+  tracking_uri: mlflow_runs # Local directory for MLflow artifacts
+  experiment_name: AmpSearcher_Experiment
+  run_name: TransformerEncoder_Screening_Run

@@ -1,1 +1,37 @@
-amp.egg-info/
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+.env
+.venv
+venv/
+env/
+
+# DVC
+.dvc/cache/
+# dvc.lock # DVC lock file is usually version controlled, uncomment if you want to ignore it
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logs and output
+lightning_logs/
+mlruns/
+results/
+data/*.csv # Ignore processed CSVs, raw data should be managed by DVC
+
+# Caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# Test coverage files
+*.coverage*
+
+# Docker and ONNX
+api/Dockerfile
+models/contrastive.onnx

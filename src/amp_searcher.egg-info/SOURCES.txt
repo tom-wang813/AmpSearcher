@@ -1,0 +1,7 @@
+README.md
+setup.py
+src/amp_searcher.egg-info/PKG-INFO
+src/amp_searcher.egg-info/SOURCES.txt
+src/amp_searcher.egg-info/dependency_links.txt
+src/amp_searcher.egg-info/requires.txt
+src/amp_searcher.egg-info/top_level.txt

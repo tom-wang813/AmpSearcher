@@ -1,21 +1,18 @@
-# setup.py
 from setuptools import setup, find_packages
 
 setup(
-    name="amp",
+    name="amp_searcher",
     version="0.1.0",
-    packages=find_packages(),    # 自动把 amp/ 下的所有包都打包
+    packages=find_packages(where="src"),
+    package_dir={"": "src"},
     install_requires=[
-        "numpy>=1.21.0",
-        "pandas>=1.3.0",
-        "scikit-learn>=0.24.0",
-        "matplotlib>=3.4.0",
-        "seaborn>=0.11.0",
-        "pytest>=6.2.0",
-        "pytest-cov>=2.12.0",
-        "black>=21.7b0",
-        "flake8>=3.9.2",
-        "isort>=5.9.3",
+        "numpy",
+        "torch",
+        "pytorch-lightning",
+        "biopython",
+        "pyyaml",
+        "torchmetrics",
+        "fastapi",
+        "uvicorn",
     ],
-    python_requires=">=3.10",
 )
